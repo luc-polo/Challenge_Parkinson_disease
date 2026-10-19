@@ -42,3 +42,7 @@ Améliorations possibles :
 - Entraîner les modèles d'imputation multivariée successivement, en utilisant les prédictions des précédents comme entrées.
 - Essayer d'imputer les valeurs de `time_since_intake_on/off`.
 - Essayer d'ajouter des variables plus pertinentes pour les modèles d'imputation multivariée par régression.
+
+
+
+I have tried to add ledd*/time but performance have rather decreased than increased
