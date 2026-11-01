@@ -61,15 +61,46 @@ Voici les features qui ont été testées:
 - `off_on_median_patient` : médiane de l’écart `off - on` du patient.
 - `disease_duration` : durée de la maladie, calculée par `age - age_at_diagnosis`.
 - `ledd_x_time_on`, `ledd_x_time_off` : produits de la LEDD par le délai depuis la prise du traitement pour les mesures ON et OFF.
-- `ledd_time_ratio_on`, `ledd_time_ratio_off` : rapports `ledd / (1 + time_since_intake_on)` et `ledd / (1 + time_since_intake_off)`.
 - `on_trend_at_visit`, `off_trend_at_visit` : valeurs estimées à l’âge de la visite actuelle par les droites de tendance du patient.
 - `on_previous`, `on_next`, `off_previous`, `off_next` : valeurs ON/OFF des visites précédente et suivante disponibles.
 - `on_previous_gap`, `on_next_gap`, `off_previous_gap`, `off_next_gap` : écarts de temps entre la visite actuelle et les visites correspondant à ces valeurs voisines.
 - `on_n_observed`, `off_n_observed`, `ledd_n_observed` : nombres de valeurs non manquantes par patient.
 - `on_std_patient`, `off_std_patient` : écarts-types des valeurs ON et OFF du patient.
 
-Ce que j'ai essayé mais qui n'a pas aidé le modèle:
+##### Ce que j'ai essayé mais qui n'a pas aidé le modèle:
+- `ledd_time_ratio_on`, `ledd_time_ratio_off` : rapports `ledd / (1 + time_since_intake_on)` et `ledd / (1 + time_since_intake_off)`.
 
-J’ai essayé d’ajouter des variables de type `ledd*/time`, mais les performances du modèle se sont plutôt dégradées qu’améliorées.
+- Effet médicamenteux :
 
-J'ai tenté d'ajouter une features qui represente la concentration de ldd dans le sang au moment de la mesure du score off à prédire. J'ai réalisé plusieurs tentatives différentes:
+J’ai fait un premier essai en définissant une courbe triangulaire commune $h_\theta(t)$ pour approximer l’effet du traitement en fonction du temps écoulé depuis la dernière prise :
+
+$$
+h_\theta(t)=\max\left(0,\min\left(\frac{t}{t_{\mathrm{pic}}},\frac{t_{\mathrm{fin}}-t}{t_{\mathrm{fin}}-t_{\mathrm{pic}}}\right)\right),
+\qquad \theta=(t_{\mathrm{pic}},t_{\mathrm{fin}}),\quad 0<t_{\mathrm{pic}}<t_{\mathrm{fin}}.
+$$
+
+La courbe est normalisée à 1 au pic ; le premier essai utilisait un effet $a\,h_\theta(t)$ avec une amplitude $a$ commune à tous les patients.
+
+J’ai ensuite modélisé cet effet par une amplitude individuelle $A_i$. Leur ajustement conjoint, sur chaque fold d’entraînement, minimise :
+
+$$
+\min_{\theta,\{A_i\ge0\}}\sum_{i,j}\left[(OFF-ON)_{ij}-A_i\bigl(h_\theta(t_{ON,ij})-h_\theta(t_{OFF,ij})\bigr)\right]^2.
+$$
+
+On effectue une recherche sur grille (*grid search*) sur les paramètres $\theta=(t_{\mathrm{pic}},t_{\mathrm{fin}})$ de la courbe $h_\theta$. Pour chaque combinaison, on calcule analytiquement l’amplitude optimale $A_i$ de chaque patient, puis la somme des erreurs au carré sur l’ensemble des paires éligibles. On retient finalement la combinaison $\theta$ qui minimise cette erreur.
+
+Pour l'entrainement on utilise uniquement les visites où ON/OFF et leurs deux délais observés sont présents (20,1 % des visites).
+
+Après entrainement,pour calculer les features finales ($A_i$, $A_i h_\theta(t_{ON/OFF})$) à ajouter au dataset, environ 40 % des patients nécessitent une amplitude commune de remplacement. Les features ajoutées avec un indicateur de remplacement n’améliorent pas HistGB (`all_groups`, avant optimisation) : MSE **14,7793 → 14,7848**.
+
+
+##### Améliorations possibles :
+
+Expected medication effect when the intake delay is missing
+
+Intake delays are missing in 46.7% of training rows for ON and 78.8% for OFF. The current pipeline fills these with medians.
+
+Rather than imputing one delay, estimate a plausible delay distribution from available patient history and pooled cohort data, then calculate:
+- expected_drug_effect_on/off
+- drug_effect_uncertainty_on/off
+Average the effect over plausible delays: for a nonlinear response curve, the effect at the average delay can differ substantially from the average effect. This could preserve useful uncertainty that a single imputed time loses.
