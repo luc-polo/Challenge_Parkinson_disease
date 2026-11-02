@@ -2,6 +2,8 @@
 
 Ce projet vise à prédire le score moteur OFF corrigé pour chaque visite d'un patient dans le cadre du [challenge de l'Institut du Cerveau](https://challengedata.ens.fr/challenges/159).
 
+[Guide du dépôt et des notebooks](README_REPO.md)
+
 ## Explication de la démarche
 
 ### Premier benchmark
