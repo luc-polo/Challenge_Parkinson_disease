@@ -104,3 +104,25 @@ Rather than imputing one delay, estimate a plausible delay distribution from ava
 - expected_drug_effect_on/off
 - drug_effect_uncertainty_on/off
 Average the effect over plausible delays: for a nonlinear response curve, the effect at the average delay can differ substantially from the average effect. This could preserve useful uncertainty that a single imputed time loses.
+
+### Modeling
+We keep the Histgb which performs the best. Here is a small ranking of all the models with optimized parameters:
+
+#### Encoder
+Une bonne inspiration ici est de combiner un transformer (qui réalise du très bon Structure Learning surr des données sequentielles) et le Histgb que nous utilisons maintenant.
+
+Nous créons donc un encodeur à l'architecture simple. Je fais le choix d'un encodeur bidirectionnel car on peut dans le train comme dans test set accéder aux visites futures comme passées des patients. Cet encodeur prend end entrée les séquences des visites de patients en applicant du padding pour les séquences trop courtes et auxquelles ont a ajouté le temps depuis la première visite pour encoder la dimenion temporelle.
+Il est entrainé à prédire les score off pour chaque visite. Voir architecture ci-dessous. Une fois ce modèle entrainé sur l'ensemble du dataset, on pass-forward l'ensemble des samples de notre trainset, extrait les embedddings de la sortie du dernier bloc d'attention pour les ajouter aux features précédemment travaillées dans features enginneering du histgb qui lui réalise la prédiciton finale. 
+
+Les améliorations notables dans cette architecture:
+-Optimisation des paramètres de l'encoder par optimisation bayesienne avec cross validation pour estimer la performance de chaque combinaison de paramètre + hold-out set pour choisir pour chaque test la meilleure valeure du nombre d'époch. -9% de MSE
+
+
+Ce que nous avons essayé et qui n'a pas amélioré la performance globale du modèle entier:
+
+-Utiliser un token CLS (pas très utile mais curiosité) +1% de MSE
+-Utiliser l'ensemble ou une partie des features crées durant le features engineering à l'entrée de l'encoder +1.8% MSE
+-Encoder le temps écoulé depuis la première visite par un vecteur sinusoïdal de dimension 64 (sinus et cosinus à différentes fréquences), ajouté aux features des visites après leur projection dans l'espace de l'encodeur. MSE quasiment inchangée
+-Utiliser les predicitons de score off prédites par l'ecodeur en plus des embeddings dans les featuures de histgb. Cependant cela nécessite de diviser le trainset en deux pour ne pas entrainer les modèles sur le même dataset. +5% de MSE
+
+Ce que nous pourions essayer différemment:
