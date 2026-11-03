@@ -60,10 +60,10 @@ Voici les features qui ont été testées:
 - `n_past_visits`, `n_future_visits` : nombres de visites strictement antérieures et ultérieures à la visite actuelle.
 - `on_slope_patient`, `off_slope_patient`, `ledd_slope_patient` : pentes annuelles des droites ajustées aux valeurs du patient en fonction de son âge.
 - `off_on_median_patient` : médiane de l’écart `off - on` du patient.
-- `on_trend_at_visit`, `off_trend_at_visit` : valeurs estimées à l’âge de la visite actuelle par les droites de tendance du patient.
+- `on_trend_at_visit`, `off_trend_at_visit` : valeurs estimées à l’âge de la visite actuelle par les droites de tendance du patient ; `off_trend_other_visits` : tendance estimée à partir des OFF observés aux autres visites.
 - `on_previous`, `on_next`, `off_previous`, `off_next` : valeurs ON/OFF des visites précédente et suivante disponibles.
 - `on_previous_gap`, `on_next_gap`, `off_previous_gap`, `off_next_gap` : écarts de temps entre la visite actuelle et les visites correspondant à ces valeurs voisines.
-- `on_n_observed`, `off_n_observed`, `ledd_n_observed` : nombres de valeurs non manquantes par patient.
+- `on_n_observed`, `off_n_observed`, `ledd_n_observed` : nombres de valeurs non manquantes après imputation par patient ; `off_observed_fraction_patient` : proportion de visites avec un OFF réellement observé.
 - `on_std_patient`, `off_std_patient` : écarts-types des valeurs ON et OFF du patient.
 
 ##### Ce que j'ai essayé mais qui n'a pas aidé le modèle:
@@ -116,15 +116,21 @@ Une bonne inspiration ici est de combiner un transformer (qui réalise du très 
 Nous créons donc un encodeur à l'architecture simple. Je fais le choix d'un encodeur bidirectionnel car on peut dans le train comme dans test set accéder aux visites futures comme passées des patients. Cet encodeur prend end entrée les séquences des visites de patients en applicant du padding pour les séquences trop courtes et auxquelles ont a ajouté le temps depuis la première visite pour encoder la dimenion temporelle.
 Il est entrainé à prédire les score off pour chaque visite. Voir architecture ci-dessous. Une fois ce modèle entrainé sur l'ensemble du dataset, on pass-forward l'ensemble des samples de notre trainset, extrait les embedddings de la sortie du dernier bloc d'attention pour les ajouter aux features précédemment travaillées dans features enginneering du histgb qui lui réalise la prédiciton finale. 
 
-Les améliorations notables dans cette architecture:
+##### Les améliorations notables dans cette architecture:
 -Optimisation des paramètres de l'encoder par optimisation bayesienne avec cross validation pour estimer la performance de chaque combinaison de paramètre + hold-out set pour choisir pour chaque test la meilleure valeure du nombre d'époch. -9% de MSE
+-Use a schduler: Cosin annealing with warm restart -7% MSE
 
 
-Ce que nous avons essayé et qui n'a pas amélioré la performance globale du modèle entier:
+##### Ce que nous avons essayé et qui n'a pas amélioré la performance globale du modèle entier:
 
 -Utiliser un token CLS (pas très utile mais curiosité) +1% de MSE
 -Utiliser l'ensemble ou une partie des features crées durant le features engineering à l'entrée de l'encoder +1.8% MSE
 -Encoder le temps écoulé depuis la première visite par un vecteur sinusoïdal de dimension 64 (sinus et cosinus à différentes fréquences), ajouté aux features des visites après leur projection dans l'espace de l'encodeur. MSE quasiment inchangée
--Utiliser les predicitons de score off prédites par l'ecodeur en plus des embeddings dans les featuures de histgb. Cependant cela nécessite de diviser le trainset en deux pour ne pas entrainer les modèles sur le même dataset. +5% de MSE
+-Utiliser les predicitons de score off prédites par l'ecodeur en plus des embeddings dans les features de histgb. Cependant cela nécessite de diviser le trainset en deux pour ne pas entrainer les modèles sur le même dataset. +5% de MSE
+-Regression Ridge à la place de histgb +5% de MSE
 
 Ce que nous pourions essayer différemment:
+
+### Post-Processing
+
+

@@ -15,7 +15,7 @@ See [README.md](README.md) for the experimental reasoning and results. This guid
 | [transformer details.md](transformer%20details.md) | Notes on encoder training, epoch selection and validation seeds. |
 | [research_two_approaches.md](research_two_approaches.md) | Proposed follow-up research on patient trajectories and measurement modeling. |
 
-Local runs can also create `catboost_info/` for CatBoost diagnostics. `.venv/` contains the local Python environment.
+`.venv/` contains the local Python environment.
 
 ## Exploration folder
 
@@ -53,7 +53,7 @@ The arrows show the development order. They are a reading guide; running the sel
 | [outlier_study.ipynb](exploration/outlier_study.ipynb) | Studies unusual observations, residuals and possible outlier treatments. |
 | [stacking/engineered.ipynb](exploration/stacking/engineered.ipynb) | Tests adding engineered visit-history features to the encoder inputs. |
 | [stacking/prediction_oof.ipynb](exploration/stacking/prediction_oof.ipynb) | Tests patient-separated out-of-fold encoder predictions as HistGB inputs instead of embeddings. |
-| [stacking/ridge_opt.ipynb](exploration/stacking/ridge_opt.ipynb) | Tests scaled Ridge regression in place of the final HistGB, with a small Optuna search for `alpha`. |
+| [stacking/ridge_opt.ipynb](exploration/stacking/ridge_opt.ipynb) | Compares scaled Ridge and Elastic Net in place of the final HistGB. Small Optuna searches reuse cached encoder features; Elastic Net tunes `alpha` and `l1_ratio`. |
 
 ### Shared code and execution
 
