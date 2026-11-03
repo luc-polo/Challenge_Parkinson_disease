@@ -133,4 +133,14 @@ Ce que nous pourions essayer différemment:
 
 ### Post-Processing
 
+Les trajectoires cibles étant non décroissantes, nous avons appliqué un post-traitement aux prédictions finales, séparément pour chaque patient. Les modèles restent inchangés. Seules leurs prédictions sont ajustées selon l’âge des visites.
+
+Deux méthodes ont été testées.
+
+- Régression isotone, pour supprimer les baisses. -0.96% de MSE
+
+- Lissage monotone, pour réduire les variations de pente en tenant compte des intervalles entre visites.
+Le paramètre de lissage λ est optimisé par gridsearch avec cross validation à 5 folds.
+ -2% de MSE
+
 
