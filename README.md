@@ -107,11 +107,17 @@ Rather than imputing one delay, estimate a plausible delay distribution from ava
 - drug_effect_uncertainty_on/off
 Average the effect over plausible delays: for a nonlinear response curve, the effect at the average delay can differ substantially from the average effect. This could preserve useful uncertainty that a single imputed time loses.
 
+### Features selection
+
+J'ai essayé plusieurs techniques de selection de features mais aucune ne s'est avérée concluante pour notre modèle optimale histgb. Voici un résumé sous forme de tableau:
+
+
+
 ### Modeling
-We keep the Histgb which performs the best. Here is a small ranking of all the models with optimized parameters:
+We keep the Histgb which performs the best. Here is a small ranking of all the models with optimized parameters.
 
 #### Encoder
-Une bonne inspiration ici est de combiner un transformer (qui réalise du très bon Structure Learning surr des données sequentielles) et le Histgb que nous utilisons maintenant.
+Une bonne inspiration ici est de combiner un transformer (qui réalise du très bon Structure Learning sur des données sequentielles) et le Histgb que nous utilisons maintenant.
 
 Nous créons donc un encodeur à l'architecture simple. Je fais le choix d'un encodeur bidirectionnel car on peut dans le train comme dans test set accéder aux visites futures comme passées des patients. Cet encodeur prend end entrée les séquences des visites de patients en applicant du padding pour les séquences trop courtes et auxquelles ont a ajouté le temps depuis la première visite pour encoder la dimenion temporelle.
 Il est entrainé à prédire les score off pour chaque visite. Voir architecture ci-dessous. Une fois ce modèle entrainé sur l'ensemble du dataset, on pass-forward l'ensemble des samples de notre trainset, extrait les embedddings de la sortie du dernier bloc d'attention pour les ajouter aux features précédemment travaillées dans features enginneering du histgb qui lui réalise la prédiciton finale. 
@@ -131,6 +137,7 @@ Il est entrainé à prédire les score off pour chaque visite. Voir architecture
 
 Ce que nous pourions essayer différemment:
 
+
 ### Post-Processing
 
 Les trajectoires cibles étant non décroissantes, nous avons appliqué un post-traitement aux prédictions finales, séparément pour chaque patient. Les modèles restent inchangés. Seules leurs prédictions sont ajustées selon l’âge des visites.
@@ -141,6 +148,6 @@ Deux méthodes ont été testées.
 
 - Lissage monotone, pour réduire les variations de pente en tenant compte des intervalles entre visites.
 Le paramètre de lissage λ est optimisé par gridsearch avec cross validation à 5 folds.
- -2% de MSE
+ -1.7% de MSE
 
 

@@ -28,8 +28,7 @@ flowchart TD
     features --> snapshot["features_selection.ipynb — shared pipeline snapshot"]
     snapshot --> baseline["stacking/baseline.ipynb"]
     baseline --> encoder["stacking/opt.ipynb"]
-    encoder --> histgb["stacking/histgb_opt.ipynb"]
-    histgb --> post["post_processing.ipynb"]
+    encoder --> post["post_processing.ipynb"]
 ```
 
 The arrows show the development order. They are a reading guide; running the selected model does not require rerunning every earlier experiment.
@@ -41,9 +40,8 @@ The arrows show the development order. They are a reading guide; running the sel
 | 3 | [features_engineering.ipynb](exploration/features_engineering.ipynb) | Adds the selected `all_groups` visit/history features after imputation and tunes HistGB. |
 | 4 | [features_selection.ipynb](exploration/features_selection.ipynb) | Stores the complete preprocessing and HistGB pipeline reused by stacking. Its feature-selection experiments are not retained in the selected pipeline. |
 | 5 | [stacking/baseline.ipynb](exploration/stacking/baseline.ipynb) | Adds frozen per-visit Transformer embeddings to the engineered features before HistGB. |
-| 6 | [stacking/opt.ipynb](exploration/stacking/opt.ipynb) | Optimizes the encoder architecture and training settings, then compares the best configurations across patient splits and seeds. |
-| 7 | [stacking/histgb_opt.ipynb](exploration/stacking/histgb_opt.ipynb) | Uses the selected encoder and retunes HistGB on the augmented features. Includes final-training and submission code. |
-| 8 | [post_processing.ipynb](exploration/post_processing.ipynb) | Evaluates the fixed selected pipeline, saves validation predictions and plots patient trajectories. It currently adds no prediction correction. |
+| 6 | [stacking/opt.ipynb](exploration/stacking/opt.ipynb) | Optimizes encoder architecture, confirms the best configurations, then tunes HistGB on the winning encoder embeddings. Includes final-training and submission code. |
+| 7 | [post_processing.ipynb](exploration/post_processing.ipynb) | Evaluates the selected pipeline, tunes monotone smoothing, plots patient trajectories and exports final test predictions. |
 
 ### Other exploration notebooks
 
@@ -57,7 +55,7 @@ The arrows show the development order. They are a reading guide; running the sel
 
 ### Shared code and execution
 
-Stacking notebooks execute five setup cells from `features_selection.ipynb` to reuse preprocessing and the baseline pipeline. `post_processing.ipynb` loads setup and encoder definitions from `stacking/histgb_opt.ipynb`. Keep these dependencies available when moving notebooks.
+Stacking notebooks execute five setup cells from `features_selection.ipynb` to reuse preprocessing and the baseline pipeline. `post_processing.ipynb` loads setup and encoder definitions from `stacking/cosine_annealing.ipynb`. Keep these dependencies available when moving notebooks.
 
 Validation separates patients between training and validation. Encoder fits include an internal patient holdout to select the epoch count, followed by a fresh fit on all patients in the training split. Hyperparameter-search scores guide selection and are not independent test scores.
 
