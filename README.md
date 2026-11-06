@@ -109,7 +109,7 @@ Average the effect over plausible delays: for a nonlinear response curve, the ef
 
 ### Features selection
 
-J'ai essayé plusieurs techniques de selection de features mais aucune ne s'est avérée concluante pour notre modèle optimale histgb. Voici un résumé sous forme de tableau:
+J'ai essayé plusieurs techniques de sélection de variables, mais aucune ne s'est avérée concluante pour notre modèle HistGB optimisé. Voici un résumé sous forme de tableau :
 
 
 
