@@ -63,7 +63,7 @@ Voici les features qui ont été testées:
 - `on_trend_at_visit`, `off_trend_at_visit` : valeurs estimées à l’âge de la visite actuelle par les droites de tendance du patient ; `off_trend_other_visits` : tendance estimée à partir des OFF observés aux autres visites.
 - `on_previous`, `on_next`, `off_previous`, `off_next` : valeurs ON/OFF des visites précédente et suivante disponibles.
 - `on_previous_gap`, `on_next_gap`, `off_previous_gap`, `off_next_gap` : écarts de temps entre la visite actuelle et les visites correspondant à ces valeurs voisines.
-- `on_n_observed`, `off_n_observed`, `ledd_n_observed` : nombres de valeurs non manquantes après imputation par patient ; `off_observed_fraction_patient` : proportion de visites avec un OFF réellement observé.
+- `n_total_visits` : nombre total de visites du patient ; `off_observed_fraction_patient` : proportion de visites avec un OFF réellement observé.
 - `on_std_patient`, `off_std_patient` : écarts-types des valeurs ON et OFF du patient.
 
 ##### Ce que j'ai essayé mais qui n'a pas aidé le modèle:

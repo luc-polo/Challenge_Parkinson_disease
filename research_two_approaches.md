@@ -56,7 +56,7 @@ These are **oracle shape diagnostics**, not out-of-sample prediction results, at
 
 Missingness is also strongly associated with severity. ON is missing in 98.9% of visits with target at most 20, versus 6.6% with target between 40 and 60. OFF is missing in approximately 0.6% and 56.1% of those respective groups. Even after subtracting each patient's mean target, visits with missing OFF have a mean centered target of +2.19, compared with −1.60 when OFF is observed. These are descriptive associations; they do not establish a causal missing-data mechanism.
 
-There is a concrete limitation in the final history representation: because `build_visit_features` runs after ON/OFF/LEDD imputation, all three `*_n_observed` features equal the patient's visit count. Neighboring-score features also refer to adjacent imputed visits rather than necessarily adjacent genuine measurements. Original row-level flags survive, so the information is not completely lost, but these aggregates do not summarize genuine observation density or its temporal gaps.
+There is a concrete limitation in the final history representation: `n_total_visits` captures the patient's visit count but not genuine observation density. Neighboring-score features also refer to adjacent imputed visits rather than necessarily adjacent genuine measurements. Original row-level flags survive, so the information is not completely lost, but these aggregates do not summarize genuine observation density or its temporal gaps.
 
 **How much confidence to place in the current validation.**
 
