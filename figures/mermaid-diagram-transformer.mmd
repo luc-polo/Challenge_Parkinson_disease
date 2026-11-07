@@ -1,0 +1,49 @@
+%% Architecture détaillée alignée sur mermaid-diagram_global_transformer.png
+%% Paramètres confirmés dans exploration/stacking/cosine_annealing.ipynb
+flowchart TB
+    IN["Séquence de visites du patient<br/>features originales imputées + indicateurs de manque<br/>+ temps écoulé"]
+    PAD["Padding + masque des visites invalides"]
+    PROJ["Projection linéaire<br/>n_features → 32D"]
+
+    IN --> PAD --> PROJ
+
+    subgraph ENC["Bloc encodeur Transformer bidirectionnel — répété ×5"]
+        direction TB
+        X["Représentation 32D par visite"]
+
+        subgraph MHA["Auto-attention multi-têtes bidirectionnelle"]
+            direction TB
+            H1["Tête 1<br/>Q, K, V : 4D"]
+            H2["Tête 2<br/>Q, K, V : 4D"]
+            H3["Tête 3<br/>Q, K, V : 4D"]
+            H4["Tête 4<br/>Q, K, V : 4D"]
+            H5["Tête 5<br/>Q, K, V : 4D"]
+            H6["Tête 6<br/>Q, K, V : 4D"]
+            H7["Tête 7<br/>Q, K, V : 4D"]
+            H8["Tête 8<br/>Q, K, V : 4D"]
+            CAT["Concaténation des têtes<br/>8 × 4D = 32D"]
+            OP["Projection de sortie<br/>32D → 32D"]
+
+            X --> H1 & H2 & H3 & H4 & H5 & H6 & H7 & H8
+            H1 & H2 & H3 & H4 & H5 & H6 & H7 & H8 --> CAT
+            CAT --> OP
+        end
+
+        OP --> D1["Dropout p = 0,208"] --> N1["Addition résiduelle + LayerNorm"]
+        X -. connexion résiduelle .-> N1
+        N1 --> F1["Linéaire 32D → 96D"]
+        F1 --> ACT["GELU + dropout p = 0,208"]
+        ACT --> F2["Linéaire 96D → 32D<br/>+ dropout p = 0,208"]
+        F2 --> N2["Addition résiduelle + LayerNorm"]
+        N1 -. connexion résiduelle .-> N2
+    end
+
+    PROJ --> X
+    N2 --> OUT["Embedding contextuel de sortie<br/>32D par visite"]
+
+    classDef primary fill:#123652,stroke:#275a7a,color:#80c2ff,stroke-width:2px;
+    classDef minor fill:#172737,stroke:#3e6684,color:#b9dcff,stroke-width:2px;
+    classDef accent fill:#173f5f,stroke:#55a8e8,color:#a8d7ff,stroke-width:2px;
+    class IN,PAD,PROJ,X,CAT,OP,N1,F1,ACT,F2,N2,OUT primary;
+    class H1,H2,H3,H4,H5,H6,H7,H8 minor;
+    class D1 accent;

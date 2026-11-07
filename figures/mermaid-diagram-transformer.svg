@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="2520" viewBox="0 0 1800 2520">
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L12,6 L0,12 z" fill="#8b9299"/>
+    </marker>
+    <style>
+      .bg { fill:#0e0f11; }
+      .group { fill:none; stroke:#292d31; stroke-width:3; }
+      .node { fill:#123652; stroke:#275a7a; stroke-width:3; }
+      .head { fill:#172737; stroke:#3e6684; stroke-width:3; }
+      .pill { fill:#0e0f11; stroke:#55a8e8; stroke-width:3; }
+      .title { font: 34px Arial, sans-serif; fill:#c1c5ca; }
+      .main { font: bold 31px Arial, sans-serif; fill:#80c2ff; text-anchor:middle; }
+      .small { font: bold 25px Arial, sans-serif; fill:#b9dcff; text-anchor:middle; }
+      .note { font: 24px Arial, sans-serif; fill:#aeb4ba; text-anchor:middle; }
+      .line { fill:none; stroke:#8b9299; stroke-width:3; marker-end:url(#arrow); }
+      .residual { fill:none; stroke:#55a8e8; stroke-width:3; stroke-dasharray:10 8; marker-end:url(#arrow); }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1800" height="2520"/>
+
+  <!-- Entrée et préparation -->
+  <rect class="node" x="450" y="35" width="900" height="150" rx="32"/>
+  <text class="main" x="900" y="88">
+    <tspan x="900">Séquence de visites du patient</tspan>
+    <tspan x="900" dy="38">features imputées + indicateurs de manque</tspan>
+    <tspan x="900" dy="38">+ temps écoulé</tspan>
+  </text>
+
+  <path class="line" d="M900 185 V230"/>
+  <rect class="node" x="550" y="235" width="700" height="105" rx="28"/>
+  <text class="main" x="900" y="300">Padding + masque des visites invalides</text>
+
+  <path class="line" d="M900 340 V385"/>
+  <rect class="node" x="610" y="390" width="580" height="105" rx="28"/>
+  <text class="main" x="900" y="455">Projection linéaire : n_features → 32D</text>
+
+  <!-- Bloc encodeur -->
+  <rect class="group" x="75" y="545" width="1650" height="1690"/>
+  <text class="title" x="115" y="595">Bloc encodeur Transformer bidirectionnel</text>
+  <rect class="pill" x="1510" y="565" width="130" height="62" rx="24"/>
+  <text class="main" x="1575" y="607">×5</text>
+
+  <path class="line" d="M900 495 V635"/>
+  <rect class="node" x="610" y="640" width="580" height="92" rx="26"/>
+  <text class="main" x="900" y="697">Représentation 32D par visite</text>
+
+  <text class="title" x="900" y="790" text-anchor="middle">Auto-attention multi-têtes bidirectionnelle</text>
+  <rect class="pill" x="1260" y="747" width="320" height="54" rx="22"/>
+  <text class="small" x="1420" y="783">masque de padding appliqué</text>
+
+  <!-- Éventail vers huit têtes -->
+  <path class="line" d="M900 732 V825 H260 V850"/>
+  <path class="line" d="M900 732 V825 H660 V850"/>
+  <path class="line" d="M900 732 V825 H1060 V850"/>
+  <path class="line" d="M900 732 V825 H1460 V850"/>
+
+  <rect class="head" x="105" y="855" width="310" height="112" rx="26"/>
+  <rect class="head" x="505" y="855" width="310" height="112" rx="26"/>
+  <rect class="head" x="905" y="855" width="310" height="112" rx="26"/>
+  <rect class="head" x="1305" y="855" width="310" height="112" rx="26"/>
+  <text class="small" x="260" y="902"><tspan x="260">Tête 1</tspan><tspan x="260" dy="34">Q, K, V : 4D</tspan></text>
+  <text class="small" x="660" y="902"><tspan x="660">Tête 2</tspan><tspan x="660" dy="34">Q, K, V : 4D</tspan></text>
+  <text class="small" x="1060" y="902"><tspan x="1060">Tête 3</tspan><tspan x="1060" dy="34">Q, K, V : 4D</tspan></text>
+  <text class="small" x="1460" y="902"><tspan x="1460">Tête 4</tspan><tspan x="1460" dy="34">Q, K, V : 4D</tspan></text>
+
+  <path class="line" d="M900 732 V990 H260 V1015"/>
+  <path class="line" d="M900 732 V990 H660 V1015"/>
+  <path class="line" d="M900 732 V990 H1060 V1015"/>
+  <path class="line" d="M900 732 V990 H1460 V1015"/>
+
+  <rect class="head" x="105" y="1020" width="310" height="112" rx="26"/>
+  <rect class="head" x="505" y="1020" width="310" height="112" rx="26"/>
+  <rect class="head" x="905" y="1020" width="310" height="112" rx="26"/>
+  <rect class="head" x="1305" y="1020" width="310" height="112" rx="26"/>
+  <text class="small" x="260" y="1067"><tspan x="260">Tête 5</tspan><tspan x="260" dy="34">Q, K, V : 4D</tspan></text>
+  <text class="small" x="660" y="1067"><tspan x="660">Tête 6</tspan><tspan x="660" dy="34">Q, K, V : 4D</tspan></text>
+  <text class="small" x="1060" y="1067"><tspan x="1060">Tête 7</tspan><tspan x="1060" dy="34">Q, K, V : 4D</tspan></text>
+  <text class="small" x="1460" y="1067"><tspan x="1460">Tête 8</tspan><tspan x="1460" dy="34">Q, K, V : 4D</tspan></text>
+
+  <!-- Fusion des têtes -->
+  <path class="line" d="M260 967 V1160 H900 V1188"/>
+  <path class="line" d="M660 967 V1160 H900 V1188"/>
+  <path class="line" d="M1060 967 V1160 H900 V1188"/>
+  <path class="line" d="M1460 967 V1160 H900 V1188"/>
+  <path class="line" d="M260 1132 V1160 H900 V1188"/>
+  <path class="line" d="M660 1132 V1160 H900 V1188"/>
+  <path class="line" d="M1060 1132 V1160 H900 V1188"/>
+  <path class="line" d="M1460 1132 V1160 H900 V1188"/>
+
+  <rect class="node" x="565" y="1193" width="670" height="100" rx="28"/>
+  <text class="main" x="900" y="1235"><tspan x="900">Concaténation des têtes</tspan><tspan x="900" dy="38">8 × 4D = 32D</tspan></text>
+
+  <path class="line" d="M900 1293 V1333"/>
+  <rect class="node" x="620" y="1338" width="560" height="92" rx="26"/>
+  <text class="main" x="900" y="1395">Projection de sortie : 32D → 32D</text>
+
+  <path class="line" d="M900 1430 V1467"/>
+  <rect class="pill" x="710" y="1472" width="380" height="70" rx="24"/>
+  <text class="small" x="900" y="1517">Dropout p = 0,208</text>
+
+  <path class="line" d="M900 1542 V1582"/>
+  <rect class="node" x="555" y="1587" width="690" height="92" rx="26"/>
+  <text class="main" x="900" y="1644">Addition résiduelle + LayerNorm</text>
+  <path class="residual" d="M610 686 H145 V1633 H555"/>
+  <text class="note" x="270" y="655">connexion résiduelle</text>
+
+  <!-- Réseau feed-forward -->
+  <path class="line" d="M900 1679 V1719"/>
+  <rect class="node" x="630" y="1724" width="540" height="84" rx="24"/>
+  <text class="main" x="900" y="1778">Linéaire : 32D → 96D</text>
+
+  <path class="line" d="M900 1808 V1845"/>
+  <rect class="node" x="600" y="1850" width="600" height="84" rx="24"/>
+  <text class="main" x="900" y="1904">GELU + dropout p = 0,208</text>
+
+  <path class="line" d="M900 1934 V1971"/>
+  <rect class="node" x="565" y="1976" width="670" height="84" rx="24"/>
+  <text class="main" x="900" y="2030">Linéaire : 96D → 32D + dropout</text>
+
+  <path class="line" d="M900 2060 V2097"/>
+  <rect class="node" x="555" y="2102" width="690" height="92" rx="26"/>
+  <text class="main" x="900" y="2159">Addition résiduelle + LayerNorm</text>
+  <path class="residual" d="M1245 1633 H1655 V2148 H1245"/>
+  <text class="note" x="1510" y="1600">connexion résiduelle</text>
+
+  <!-- Sortie -->
+  <path class="line" d="M900 2194 V2310"/>
+  <rect class="node" x="520" y="2315" width="760" height="130" rx="32"/>
+  <text class="main" x="900" y="2370"><tspan x="900">Embedding contextuel de sortie</tspan><tspan x="900" dy="42">32D par visite</tspan></text>
+  <text class="note" x="900" y="2490">Chaque visite peut utiliser le contexte des visites passées et futures du patient.</text>
+</svg>
